@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zombie</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            background-color: rgba(53, 2, 2, 0.981);
+            padding: 30px;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        button {
+            width: 135px;
+            padding: 10px 25px;
+            background-color: rgba(53, 2, 2, 0.981);
+            border: 2px solid white;
+            border-radius: 5px;
+            color: white
+        }
+
+        .game-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            color: white;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            width: 800px;
+            border-radius: 10px;
+            margin: 50px auto;
+            background-image: url("images/wall.jpg");
+            background-size: 100%;
+            background-position-y: -255px;
+            box-shadow: 0 0 50px 30px rgba(0, 0, 0, 0.5);
+            cursor: url("images/aim.svg"), pointer;
+        }
+
+        .item {
+            box-sizing: border-box;
+            width: 120px;
+            height: 120px;
+            margin: 10px 20px;
+            border-radius: 50%;
+        }
+
+        img {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="game-panel">
+        <div>
+            <button id="sound-btn">SOUND ON</button>
+            <button id="start-btn">START</button>
+        </div>
+        <div>
+            <div class="counter">HITS:
+                <span id="hit-counter">0</span>
+            </div>
+            <div class="counter">MISS:
+                <span id="miss-counter">0</span>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="item"></div>
+        <div class="item"></div>
+        <div class="item"></div>
+        <div class="item"></div>
+        <div class="item"></div>
+        <div class="item"></div>
+        <div class="item"></div>
+        <div class="item"></div>
+        <div class="item"></div>
+        <div class="item"></div>
+        <div class="item"></div>
+        <div class="item"></div>
+        <div class="item"></div>
+        <div class="item"></div>
+        <div class="item"></div>
+    </div>
+
+    <audio id="sound-bu" src="./sounds/bu.mp3" loop></audio>
+
+    <audio id="sound-shot" src="./sounds/shot.mp3"></audio>
+
+    <script>
+
+        const items = document.querySelectorAll(".item")
+
+        let randomIndex;
+
+        const zombieImg = document.createElement('img')
+        zombieImg.src = "./images/zombie.png"
+        randomIndex = getRandomItemIndex(items)
+
+        const missCounter = document.querySelector('#miss-counter')
+        const startBtn = document.querySelector('#start-btn')
+
+        const hitImg = document.createElement('img')
+        hitImg.src = "./images/blood.png"
+
+        const hitCounter = document.querySelector('#hit-counter')
+        const shot = document.querySelector('#sound-shot')
+
+        const bu = document.querySelector('#sound-bu')
+        const sountBtn = document.querySelector('#sound-btn')
+
+
+
+        let hit = true;
+        let isStarted = false;
+        let interval;
+
+        function playGame() {
+            interval = setInterval(
+                function () {
+                    if (hit === true) {
+                        hit = false
+                    } else {
+                        missCounter.innerText++
+                    }
+                    randomIndex = getRandomItemIndex(items)
+                    items[randomIndex].append(zombieImg)
+                    hitImg.remove()
+                },
+                2000
+            )
+        }
+
+        startBtn.onclick = function () {
+            if (isStarted === true) {
+                isStarted = false
+                zombieImg.onclick = null
+                zombieImg.remove()
+                hitImg.remove()
+                missCounter.innerText = 0
+                hitCounter.innerText = 0
+                startBtn.innerText = 'START'
+                clearInterval(interval)
+            } else {
+                isStarted = true
+                zombieImg.onclick = function () {
+                    hit = true
+                    hitCounter.innerText++
+                    shot.currentTime = 0
+                    shot.play()
+                    zombieImg.remove()
+                    items[randomIndex].append(hitImg)
+                }
+                items[randomIndex].append(zombieImg)
+                playGame()
+                startBtn.innerText = 'STOP'
+            }
+        }
+
+        function getRandomItemIndex(array) {
+            return Math.floor(Math.random() * array.length)
+        }
+
+        sountBtn.onclick = function () {
+            if (bu.currentTime) {
+                bu.pause()
+                bu.currentTime = 0
+                sountBtn.innerHTML = "SOUND ON"
+            } else {
+                bu.play()
+                sountBtn.innerHTML = "SOUND OFF"
+            }
+        }
+    </script>
+</body>
+
+</html>
